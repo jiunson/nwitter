@@ -1,9 +1,9 @@
 import { async } from "@firebase/util";
 import { dbService } from "fbase";
-import { addDoc, collection, doc, getDocs } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 
-const Home = () => {
+const Home = ({ userObj }) => {
     const [nweet, setNweet] = useState("");
     const [nweets, setNweets] = useState([]);   // array
     // Nweets 조회
@@ -24,7 +24,14 @@ const Home = () => {
         
     };
     useEffect(() => {
-        getNweets();
+        // Nweets 조회 -> onSnapshot()으로 대체함.
+        //getNweets();
+
+        // Nweets 실시간 조회 
+        const unsub = onSnapshot(collection(dbService,"nweets"), (snapshot) => {
+            const nweetArray = snapshot.docs.map(doc => ({id:doc.id, ...doc.data()}));
+            setNweets(nweetArray);
+        });
     }, []);
 
     // Nweet 등록 
@@ -32,10 +39,11 @@ const Home = () => {
         event.preventDefault();
         try {
             const docRef = await addDoc(collection(dbService, "nweets"), {
-                nweet,
+                text: nweet,
                 createdAt: Date.now(),
+                creatorId: userObj.uid,
             });
-            console.log("Document writen with ID : ", docRef.id);
+            //console.log("Document writen with ID : ", docRef.id);
             setNweet("");
         } catch(e) {
             console.error("Error : ", e);
@@ -45,7 +53,6 @@ const Home = () => {
         const { target: { value } } = event;
         setNweet(value);
     };
-    console.log(nweets);
     return (
         <div>
             <form onSubmit={onSubmit}>
@@ -55,7 +62,7 @@ const Home = () => {
             <div>
                 {nweets.map((nweet) => (
                     <div key={nweet.id}>
-                        <h4>{nweet.nweet}</h4>
+                        <h4>{nweet.text}</h4>
                     </div>
                 ))}
             </div>
