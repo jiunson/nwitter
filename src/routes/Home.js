@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 const Home = ({ userObj }) => {
     const [nweet, setNweet] = useState("");
     const [nweets, setNweets] = useState([]);   // array
+    const [attachment, setAttachment] = useState();
     // Nweets 조회
     const getNweets = async () => {
         try {
@@ -44,7 +45,6 @@ const Home = ({ userObj }) => {
                 createdAt: Date.now(),
                 creatorId: userObj.uid,
             });
-            //console.log("Document writen with ID : ", docRef.id);
             setNweet("");
         } catch(e) {
             console.error("Error : ", e);
@@ -54,11 +54,30 @@ const Home = ({ userObj }) => {
         const { target: { value } } = event;
         setNweet(value);
     };
+    const onFileChange = (event) => {
+        // Preview Image
+        const { target: { files }} = event;
+        const theFile = files[0];
+        const reader = new FileReader();
+        reader.onloadend = (finishedEvent) => {
+            const { currentTarget: { result }} = finishedEvent;
+            setAttachment(result);
+        };
+        reader.readAsDataURL(theFile);
+    };
+    const onClearAttachment = () => setAttachment(null);
     return (
         <div>
             <form onSubmit={onSubmit}>
                 <input type="text" onChange={onChange} placeholder="What's on your mind?" value={nweet} maxLength={120} />
+                <input type="file" accept="image/*" onChange={onFileChange} />
                 <input type="submit" value="Nweet" />
+                { attachment && (
+                    <div>
+                        <img src={attachment} width="100px" height="100px" />
+                        <button onClick={onClearAttachment}>Clear</button>
+                    </div>
+                )}
             </form>
             <div>
                 {nweets.map((nweet) => (
