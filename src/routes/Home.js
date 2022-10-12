@@ -1,4 +1,5 @@
 import { async } from "@firebase/util";
+import Nweet from "components/Nweet";
 import { dbService } from "fbase";
 import { addDoc, collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
@@ -27,7 +28,7 @@ const Home = ({ userObj }) => {
         // Nweets 조회 -> onSnapshot()으로 대체함.
         //getNweets();
 
-        // Nweets 실시간 조회 
+        // onSnapshot 이벤트를 이용한 실시간 조회 
         const unsub = onSnapshot(collection(dbService,"nweets"), (snapshot) => {
             const nweetArray = snapshot.docs.map(doc => ({id:doc.id, ...doc.data()}));
             setNweets(nweetArray);
@@ -61,9 +62,7 @@ const Home = ({ userObj }) => {
             </form>
             <div>
                 {nweets.map((nweet) => (
-                    <div key={nweet.id}>
-                        <h4>{nweet.text}</h4>
-                    </div>
+                    <Nweet key={nweet.id} nweetObj={nweet} isOwner={nweet.creatorId === userObj.uid} />
                 ))}
             </div>
         </div>
