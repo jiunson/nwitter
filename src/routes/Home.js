@@ -1,13 +1,15 @@
 import { async } from "@firebase/util";
+import { v4 as uuidv4 } from "uuid";
 import Nweet from "components/Nweet";
-import { dbService } from "fbase";
+import { dbService, storageService } from "fbase";
 import { addDoc, collection, doc, getDocs, onSnapshot } from "firebase/firestore";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 
 const Home = ({ userObj }) => {
     const [nweet, setNweet] = useState("");
     const [nweets, setNweets] = useState([]);   // array
-    const [attachment, setAttachment] = useState();
+    const [attachment, setAttachment] = useState("");
     // Nweets 조회
     const getNweets = async () => {
         try {
@@ -36,16 +38,31 @@ const Home = ({ userObj }) => {
         });
     }, []);
 
-    // Nweet 등록 
     const onSubmit = async (event) => {
         event.preventDefault();
+        // Upload Attachment
+        let attachmentUrl;
+        if(attachment != "") {
+            // 파일 업로드를 수행하기 위해 작업할 파일을 가리키는 참조.
+            const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
+            // Upload file
+            const response = await uploadString(fileRef, attachment, 'data_url');
+            // Get download url
+            attachmentUrl = await getDownloadURL(response.ref);
+        }
+        
+        const nweetObj = {
+            text: nweet,
+            createdAt: Date.now(),
+            creatorId: userObj.uid,
+            attachmentUrl
+        };
+
+        // Nweet 등록 
         try {
-            const docRef = await addDoc(collection(dbService, "nweets"), {
-                text: nweet,
-                createdAt: Date.now(),
-                creatorId: userObj.uid,
-            });
+            const docRef = await addDoc(collection(dbService, "nweets"), nweetObj);
             setNweet("");
+            setAttachment("");
         } catch(e) {
             console.error("Error : ", e);
         }
@@ -65,7 +82,7 @@ const Home = ({ userObj }) => {
         };
         reader.readAsDataURL(theFile);
     };
-    const onClearAttachment = () => setAttachment(null);
+    const onClearAttachment = () => setAttachment("");
     return (
         <div>
             <form onSubmit={onSubmit}>
