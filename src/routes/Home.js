@@ -2,7 +2,7 @@ import { async } from "@firebase/util";
 import { v4 as uuidv4 } from "uuid";
 import Nweet from "components/Nweet";
 import { dbService, storageService } from "fbase";
-import { addDoc, collection, doc, getDocs, onSnapshot } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, onSnapshot, orderBy, query } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 
@@ -32,17 +32,19 @@ const Home = ({ userObj }) => {
         //getNweets();
 
         // onSnapshot 이벤트를 이용한 실시간 조회 
-        const unsub = onSnapshot(collection(dbService,"nweets"), (snapshot) => {
+        const q = query(collection(dbService, "nweets"), orderBy("createdAt","desc"));
+        const unsub = onSnapshot(q, (snapshot) => {
             const nweetArray = snapshot.docs.map(doc => ({id:doc.id, ...doc.data()}));
             setNweets(nweetArray);
         });
     }, []);
 
+    // 등록
     const onSubmit = async (event) => {
         event.preventDefault();
         // Upload Attachment
         let attachmentUrl;
-        if(attachment != "") {
+        if(attachment !== "") {
             // 파일 업로드를 수행하기 위해 작업할 파일을 가리키는 참조.
             const fileRef = ref(storageService, `${userObj.uid}/${uuidv4()}`);
             // Upload file
