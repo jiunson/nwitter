@@ -13,7 +13,7 @@ const AppRouter = ({ isLoginedIn, userObj }) => {
                 {isLoginedIn ? ( // 로그인 상태
                     <>
                         <Route path="/" element={<Home userObj={userObj} />}></Route>
-                        <Route path="/profile" element={<Profile />}></Route>
+                        <Route path="/profile" element={<Profile userObj={userObj} />}></Route>
                         <Route path="*" element={<Navigate replcae to="/" />}></Route>
                     </>
                 ) : (       // 로그아웃 상태
