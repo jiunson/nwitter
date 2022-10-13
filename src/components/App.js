@@ -11,7 +11,13 @@ function App() {
     authService.onAuthStateChanged((user) => {
       if(user) {
         setIsLoginedIn(true);
-        setUserObj(user);
+        // setUserObj(user); 
+        // 오브젝트 너무 커서 데이터 변화 감지 오류 발생.
+        setUserObj({
+          displayName: user.displayName,
+          uid: user.uid,
+          updateProfile: (args) => user.updateProfile(args),
+        });
       } else {
         setIsLoginedIn(false);
       }
@@ -19,9 +25,18 @@ function App() {
       //console.log('isLoginedIn', isLoginedIn);
     });
   }, []);
+  // Profile 업데이트 시 호출하여 UI정보를 갱신한다.
+  const refreshUser = () => {
+    const user = authService.currentUser;
+    setUserObj({
+      displayName: user.displayName,
+      uid: user.uid,
+      updateProfile: (args) => user.updateProfile(args),
+    });
+  };
   return (
     <>
-      {init ? <AppRouter isLoginedIn={isLoginedIn} userObj={userObj} /> : "Initializing..."}
+      {init ? <AppRouter refreshUser={refreshUser} isLoginedIn={isLoginedIn} userObj={userObj} /> : "Initializing..."}
     </>
   );
 }
