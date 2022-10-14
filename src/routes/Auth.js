@@ -1,8 +1,13 @@
-import { async } from "@firebase/util";
+import React, { useState } from "react";
 import AuthForm from "components/AuthForm";
 import { authService } from "fbase";
-import { createUserWithEmailAndPassword, GithubAuthProvider, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import React, { useState } from "react";
+import { GithubAuthProvider, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faTwitter,
+    faGoogle,
+    faGithub,
+  } from "@fortawesome/free-brands-svg-icons";
 
 const Auth =  () => {
     // 소셜 로그인 
@@ -19,11 +24,21 @@ const Auth =  () => {
         const data = await signInWithPopup(authService, provider);
     };
     return (
-        <div>
+        <div className="authContainer">
+            <FontAwesomeIcon
+                icon={faTwitter}
+                color={"#04AAFF"}
+                size="3x"
+                style={{ marginBottom: 30 }}
+            />
             <AuthForm />
-            <div>
-                <button name="google" onClick={onSoicalClick}>Continue with Google</button>
-                <button name="github" onClick={onSoicalClick}>Continue with Github</button>
+            <div className="authBtns">
+                <button name="google" onClick={onSoicalClick} className="authBtn">
+                    Continue with Google  <FontAwesomeIcon icon={faGoogle} />
+                </button>
+                <button name="github" onClick={onSoicalClick} className="authBtn">
+                    Continue with Github <FontAwesomeIcon icon={faGithub} />
+                </button>
             </div>
         </div>
     );

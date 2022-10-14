@@ -9,6 +9,13 @@ const AppRouter = ({ refreshUser, isLoginedIn, userObj }) => {
     return (
         <Router>
             {isLoginedIn && <Navigation userObj={userObj} />}
+            <div style={{
+                width: "100%",
+                margin: "0 autho",
+                marginTop: 80,
+                display: "flex",
+                justifyContent: "center",
+            }}>
             <Routes>
                 {isLoginedIn ? ( // 로그인 상태
                     <>
@@ -23,6 +30,7 @@ const AppRouter = ({ refreshUser, isLoginedIn, userObj }) => {
                     </>
                 )}
             </Routes>
+            </div>
         </Router>
     );
 }

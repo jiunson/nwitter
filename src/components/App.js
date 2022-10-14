@@ -5,7 +5,7 @@ import { authService } from "fbase";
 function App() {
   const [init, setInit] = useState(false);
   const [isLoginedIn, setIsLoginedIn] = useState(false);
-  const [userObj, setUserObj] = useState(null);
+  const [userObj, setUserObj] = useState(null);         // 공용 State
   useEffect(() => {
     // Check LogIn
     authService.onAuthStateChanged((user) => {
